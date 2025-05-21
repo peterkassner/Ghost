@@ -1,6 +1,7 @@
 import GhostLogo from '../assets/images/orb-pink.png';
 import React, {useEffect, useRef} from 'react';
 import clsx from 'clsx';
+
 import {Button, Icon, SettingNavItem, SettingNavItemProps, SettingNavSection, TextField, useFocusContext} from '@tryghost/admin-x-design-system';
 import {searchKeywords as advancedSearchKeywords} from './settings/advanced/AdvancedSettings';
 import {checkStripeEnabled, getSettingValues} from '@tryghost/admin-x-framework/api/settings';
@@ -185,6 +186,7 @@ const Sidebar: React.FC = () => {
                     <NavItem icon='emailfield' keywords={growthSearchKeywords.embedSignupForm} navid='embed-signup-form' title="Embeddable signup form" onClick={handleSectionClick} />
                     {hasStripeEnabled && <NavItem icon='discount' keywords={growthSearchKeywords.offers} navid='offers' title="Offers" onClick={handleSectionClick} />}
                     {hasTipsAndDonations && hasStripeEnabled && <NavItem icon='piggybank' keywords={growthSearchKeywords.tips} navid='tips-and-donations' title="Tips & donations" onClick={handleSectionClick} />}
+                    <NavItem icon='magnifying-glass' keywords={growthSearchKeywords.explore} navid='explore' title="Explore" onClick={handleSectionClick} />
                 </SettingNavSection>
 
                 <SettingNavSection isVisible={checkVisible(Object.values(emailSearchKeywords).flat())} title="Email newsletter">
