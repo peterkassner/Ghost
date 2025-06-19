@@ -4,6 +4,8 @@ const errors = require('@tryghost/errors');
 
 const utils = require('../../../../../core/server/data/migrations/utils');
 
+const MIGRATION_USER = 1;
+
 class Deferred {
     constructor() {
         this.promise = new Promise((resolve, reject) => {
@@ -225,9 +227,9 @@ async function setupPermissionsDb() {
         name: 'Role Name',
         description: 'Role description',
         created_at: date,
-        created_by: utils.meta.MIGRATION_USER,
+        created_by: MIGRATION_USER,
         updated_at: date,
-        updated_by: utils.meta.MIGRATION_USER
+        updated_by: MIGRATION_USER
     });
 
     await knex('roles').insert({
@@ -235,9 +237,9 @@ async function setupPermissionsDb() {
         name: 'Other Role Name',
         description: 'Other Role description',
         created_at: date,
-        created_by: utils.meta.MIGRATION_USER,
+        created_by: MIGRATION_USER,
         updated_at: date,
-        updated_by: utils.meta.MIGRATION_USER
+        updated_by: MIGRATION_USER
     });
 
     await knex('permissions').insert({
@@ -246,9 +248,9 @@ async function setupPermissionsDb() {
         action_type: 'action',
         object_type: 'object',
         created_at: date,
-        created_by: utils.meta.MIGRATION_USER,
+        created_by: MIGRATION_USER,
         updated_at: date,
-        updated_by: utils.meta.MIGRATION_USER
+        updated_by: MIGRATION_USER
     });
 
     return knex;
