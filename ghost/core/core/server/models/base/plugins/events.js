@@ -148,12 +148,14 @@ module.exports = function (Bookshelf) {
         onCreating: function onCreating(model, attr, options) {
             if (Object.prototype.hasOwnProperty.call(schema.tables[this.tableName], 'created_by')) {
                 if (!options.importing || (options.importing && !this.get('created_by'))) {
+                    // TODO: owner user hardcoded to 1
                     this.set('created_by', String(this.contextUser(options)));
                 }
             }
 
             if (Object.prototype.hasOwnProperty.call(schema.tables[this.tableName], 'updated_by')) {
                 if (!options.importing) {
+                    // TODO: owner user hardcoded to 1
                     this.set('updated_by', String(this.contextUser(options)));
                 }
             }
@@ -218,6 +220,7 @@ module.exports = function (Bookshelf) {
 
             if (Object.prototype.hasOwnProperty.call(schema.tables[this.tableName], 'updated_by')) {
                 if (!options.importing && !options.migrating) {
+                    // TODO: owner user hardcoded to 1
                     this.set('updated_by', String(this.contextUser(options)));
                 }
             }

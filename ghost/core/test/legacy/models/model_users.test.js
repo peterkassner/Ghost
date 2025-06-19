@@ -448,6 +448,7 @@ describe('User Model', function run() {
                 password: 'thisissupersafe'
             };
 
+            // TODO: owner user hardcoded to 1
             UserModel.setup(userData, {id: 1})
                 .then(function (user) {
                     user.get('name').should.eql(userData.name);

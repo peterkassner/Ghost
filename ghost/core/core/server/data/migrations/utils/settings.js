@@ -2,6 +2,7 @@ const ObjectId = require('bson-objectid').default;
 const logging = require('@tryghost/logging');
 
 const {createTransactionalMigration} = require('./migrations');
+// TODO: owner user hardcoded to 1
 const {MIGRATION_USER} = require('./constants');
 
 /**

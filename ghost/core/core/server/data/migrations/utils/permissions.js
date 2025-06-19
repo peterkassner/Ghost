@@ -4,6 +4,7 @@ const errors = require('@tryghost/errors');
 const tpl = require('@tryghost/tpl');
 
 const {createTransactionalMigration, combineTransactionalMigrations} = require('./migrations');
+// TODO: owner user hardcoded to 1
 const {MIGRATION_USER} = require('./constants');
 
 const messages = {

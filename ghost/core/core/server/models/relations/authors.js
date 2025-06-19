@@ -77,6 +77,7 @@ module.exports.extendModel = function extendModel(Post, Posts, ghostBookshelf) {
 
         onCreating: function onCreating(model, attrs, options) {
             if (!model.get('authors')) {
+                // TODO: owner user hardcoded to 1
                 model.set('authors', [{
                     id: this.contextUser(options)
                 }]);

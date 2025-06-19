@@ -31,8 +31,10 @@ class LabelsImporter extends TableImporter {
             name: name,
             slug: `${slugify(name)}`,
             created_at: dateToDatabaseString(blogStartDate),
+            // TODO: owner user hardcoded to 1
             created_by: '1',
             updated_at: dateToDatabaseString(blogStartDate),
+            // TODO: owner user hardcoded to 1
             updated_by: '1'
         };
     }

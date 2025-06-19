@@ -40,9 +40,11 @@ const setupGhost = async (page) => {
     ]);
 
     // Add owner user data from usual fixture
+    // TODO: owner user hardcoded to 1
     const ownerUser = DataGenerator.Content.users.find(user => user.id === '1');
 
     if (action === actions.signin) {
+        // TODO: owner user hardcoded to 1
         await signInAsUserById(page, '1');
     } else if (action === actions.setup) {
         // Complete setup process

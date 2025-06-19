@@ -128,6 +128,7 @@ class UpdateCheckService {
             data.theme = theme ? theme.value : '';
             data.post_count = posts && posts.meta && posts.meta.pagination ? posts.meta.pagination.total : 0;
             data.user_count = users && users.users && users.users.length ? users.users.length : 0;
+            // TODO: owner user hardcoded to 1 - assumes first user is the owner
             data.blog_created_at = users && users.users && users.users[0] && users.users[0].created_at ? moment(users.users[0].created_at).unix() : '';
             data.npm_version = npm.stdout.trim();
 

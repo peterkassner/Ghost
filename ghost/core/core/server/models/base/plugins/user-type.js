@@ -52,6 +52,7 @@ module.exports = function (Bookshelf) {
              * See https://github.com/TryGhost/Ghost/issues/9299.
              *
              * We currently don't read the correct owner ID from the database and assume it's '1'.
+             * TODO: owner user hardcoded to 1
              * This is a leftover from switching from auto increment ID's to Object ID's.
              * But this takes too long to refactor out now. If an internal update happens, we also
              * use ID '1'. This logic exists for a LONG while now. The owner ID only changes from '1' to something else,
@@ -75,6 +76,7 @@ module.exports = function (Bookshelf) {
          * we keep type Number, because we have too many check's where we rely on Number
          * context.user ? true : false (if context.user is 0 as number, this condition is false)
          */
+        // TODO: owner user hardcoded to 1
         internalUser: 1,
 
         isInternalUser: function isInternalUser(id) {

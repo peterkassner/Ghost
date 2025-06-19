@@ -807,6 +807,7 @@ Post = ghostBookshelf.Model.extend({
         if ((newStatus === 'published' || newStatus === 'sent') && this.hasChanged('status')) {
             // unless published_by is set and we're importing, set published_by to contextUser
             if (!(this.get('published_by') && options.importing)) {
+                // TODO: owner user hardcoded to 1
                 this.set('published_by', String(this.contextUser(options)));
             }
         } else {
@@ -951,6 +952,7 @@ Post = ghostBookshelf.Model.extend({
                     revision_interval_ms: POST_REVISIONS_INTERVAL_MS
                 }
             });
+            // TODO: owner user hardcoded to 1
             let authorId = this.contextUser(options);
             const authorExists = await ghostBookshelf.model('User').findOne({id: authorId}, {transacting: options.transacting});
             if (!authorExists) {

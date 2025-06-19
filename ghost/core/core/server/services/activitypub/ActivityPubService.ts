@@ -128,6 +128,7 @@ export class ActivityPubService {
                 secret: secret,
                 integration_id: integration.id,
                 created_at: this.knex.raw('current_timestamp'),
+                // TODO: owner user hardcoded to 1
                 created_by: '1'
             };
         });

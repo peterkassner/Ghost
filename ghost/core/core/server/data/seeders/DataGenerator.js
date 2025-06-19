@@ -96,9 +96,11 @@ class DataGenerator {
             this.logger.debug(`Clearing table ${table}`);
 
             if (table === 'roles_users') {
+                // TODO: owner user hardcoded to 1
                 await transaction(table).del().whereNot('user_id', '1');
             } else if (table === 'users') {
                 // Avoid deleting the admin user
+                // TODO: owner user hardcoded to 1
                 await transaction(table).del().whereNot('id', '1');
             } else {
                 await transaction(table).truncate();

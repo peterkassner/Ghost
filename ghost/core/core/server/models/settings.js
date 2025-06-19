@@ -298,6 +298,7 @@ Settings = ghostBookshelf.Model.extend({
             } catch (e) {
                 // in some tests the owner is deleted and not recreated before setup
                 if (e.errorType === 'NotFoundError') {
+                    // TODO: owner user hardcoded to 1
                     owner = {id: 1};
                 } else {
                     throw e;

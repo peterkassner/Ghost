@@ -66,6 +66,7 @@ test.describe('Portal', () => {
 
             await signOutCurrentUser(sharedPage);
 
+            // TODO: owner user hardcoded to 1
             await signInAsUserById(sharedPage, '1');
         });
 
@@ -133,6 +134,7 @@ test.describe('Portal', () => {
 
                 await signOutCurrentUser(sharedPage);
 
+                // TODO: owner user hardcoded to 1
                 await signInAsUserById(sharedPage, '1');
             });
         });

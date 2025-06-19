@@ -127,6 +127,7 @@ DataGenerator.Content = {
     users: [
         {
             // owner (owner is still id 1 because of permissions)
+            // TODO: owner user hardcoded to 1
             id: '1',
             name: 'Joe Bloggs',
             slug: 'joe-bloggs',
