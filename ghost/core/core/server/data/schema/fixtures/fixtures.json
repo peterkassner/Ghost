@@ -722,7 +722,6 @@
             "name": "User",
             "entries": [
                 {
-                    "id": 1,
                     "name": "Ghost",
                     "email": "ghost@example.com",
                     "status": "inactive",
@@ -746,8 +745,9 @@
                     "type": "post",
                     "status": "published",
                     "visibility": "public",
-                    "created_by": "1",
-                    "published_by": "1"
+                    "created_by": "{{OWNER_USER_ID}}",
+                    "published_by": "{{OWNER_USER_ID}}",
+                    "authors": [{"id": "{{OWNER_USER_ID}}"}]
                 },
                 {
                     "title": "About this site",
@@ -757,8 +757,9 @@
                     "type": "page",
                     "status": "published",
                     "visibility": "public",
-                    "created_by": "1",
-                    "published_by": "1"
+                    "created_by": "{{OWNER_USER_ID}}",
+                    "published_by": "{{OWNER_USER_ID}}",
+                    "authors": [{"id": "{{OWNER_USER_ID}}"}]
                 }
             ]
         },
@@ -1023,7 +1024,7 @@
                 "match": "name"
             },
             "entries": {
-                "1": ["Owner"]
+                "{{OWNER_USER_ID}}": ["Owner"]
             }
         }
     ]

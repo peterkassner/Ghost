@@ -67,6 +67,74 @@ class FixtureManager {
      * @param {object} options
      * @returns
      */
+    /**
+     * Get owner user ID for placeholder resolution
+     * During fixture loading, we cache the Ghost user ID when it's created
+     * @returns {Promise<string>}
+     */
+    async getOwnerUserId() {
+        if (this._ownerUserId) {
+            logging.info(`Using cached owner user ID: ${this._ownerUserId}`);
+            return this._ownerUserId;
+        }
+
+        logging.info('Owner user ID not cached, attempting to find...');
+
+        // During fixture loading, if we haven't cached the ID yet, try to find by email
+        try {
+            let ownerUser = await models.User.findOne({email: 'ghost@example.com'});
+            
+            // If that fails, try the standard getOwnerUser method (for cases where roles are already assigned)
+            if (!ownerUser) {
+                ownerUser = await models.User.getOwnerUser();
+            }
+            
+            if (ownerUser) {
+                this._ownerUserId = ownerUser.id;
+                logging.info(`Found and cached owner user ID: ${this._ownerUserId}`);
+                return this._ownerUserId;
+            }
+        } catch (error) {
+            // During very early fixture loading, database queries might fail
+            // This is expected - we'll cache the ID when the user is created
+            logging.info(`Failed to find owner user: ${error.message}`);
+        }
+
+        throw new Error('Owner user not found - cannot resolve {{OWNER_USER_ID}} placeholder. This might happen if placeholders are used before the Ghost user is created.');
+    }
+
+    /**
+     * Resolve placeholders in fixture data
+     * Simple implementation that only processes strings and leaves everything else untouched
+     * @param {any} data - The fixture data to process
+     * @returns {Promise<any>} - Data with placeholders resolved
+     */
+    async resolvePlaceholders(data) {
+        if (typeof data === 'string' && data.includes('{{OWNER_USER_ID}}')) {
+            const ownerUserId = await this.getOwnerUserId();
+            return data.replace(/\{\{OWNER_USER_ID\}\}/g, ownerUserId);
+        }
+
+        if (_.isArray(data)) {
+            const resolved = [];
+            for (let i = 0; i < data.length; i++) {
+                resolved[i] = await this.resolvePlaceholders(data[i]);
+            }
+            return resolved;
+        }
+
+        if (_.isPlainObject(data)) {
+            const resolved = {};
+            for (const [key, value] of Object.entries(data)) {
+                resolved[key] = await this.resolvePlaceholders(value);
+            }
+            return resolved;
+        }
+
+        // Return everything else unchanged (Date objects, Moment objects, functions, etc.)
+        return data;
+    }
+
     async addAllFixtures(options) {
         const localOptions = _.merge({
             autoRefresh: false,
@@ -83,16 +151,31 @@ class FixtureManager {
         const userRolesRelation = this.fixtures.relations.find(r => r.from.relation === 'roles');
         await this.addFixturesForRelation(userRolesRelation, localOptions);
 
-        await sequence(this.fixtures.models.filter(m => !['User', 'Role'].includes(m.name)).map(model => () => {
-            logging.info('Model: ' + model.name);
+        // Patch getOwnerUser during fixture loading to use our cached ID
+        const originalGetOwnerUser = models.User.getOwnerUser;
+        const fixtureManager = this;
+        models.User.getOwnerUser = function(options) {
+            if (fixtureManager._ownerUserId) {
+                return models.User.findOne({id: fixtureManager._ownerUserId}, options || {});
+            }
+            return originalGetOwnerUser.call(this, options);
+        };
 
-            return this.addFixturesForModel(model, localOptions);
-        }));
+        try {
+            await sequence(this.fixtures.models.filter(m => !['User', 'Role'].includes(m.name)).map(model => () => {
+                logging.info('Model: ' + model.name);
 
-        await sequence(this.fixtures.relations.filter(r => r.from.relation !== 'roles').map(relation => () => {
-            logging.info('Relation: ' + relation.from.model + ' to ' + relation.to.model);
-            return this.addFixturesForRelation(relation, localOptions);
-        }));
+                return this.addFixturesForModel(model, localOptions);
+            }));
+
+            await sequence(this.fixtures.relations.filter(r => r.from.relation !== 'roles').map(relation => () => {
+                logging.info('Relation: ' + relation.from.model + ' to ' + relation.to.model);
+                return this.addFixturesForRelation(relation, localOptions);
+            }));
+        } finally {
+            // Restore the original getOwnerUser method
+            models.User.getOwnerUser = originalGetOwnerUser;
+        }
     }
 
     /*
@@ -244,7 +327,23 @@ class FixtureManager {
 
             const found = await models[modelFixture.name].findOne(data, options);
             if (!found) {
-                return models[modelFixture.name].add(entry, options);
+                let resolvedEntry = entry;
+                
+                // Only resolve placeholders for models that actually need them (like Posts)
+                // User model doesn't need placeholder resolution
+                if (modelFixture.name !== 'User') {
+                    resolvedEntry = await this.resolvePlaceholders(entry);
+                }
+                
+                const result = await models[modelFixture.name].add(resolvedEntry, options);
+                
+                // Cache the Ghost user ID when it's created
+                if (modelFixture.name === 'User' && entry.email === 'ghost@example.com') {
+                    this._ownerUserId = result.id;
+                    logging.info(`Cached owner user ID: ${this._ownerUserId}`);
+                }
+                
+                return result;
             }
         }));
 
@@ -265,7 +364,10 @@ class FixtureManager {
 
         const data = await this.fetchRelationData(relationFixture, options);
 
-        _.each(relationFixture.entries, (entry, key) => {
+        // Resolve placeholders in relation entries
+        const resolvedEntries = await this.resolvePlaceholders(relationFixture.entries);
+
+        _.each(resolvedEntries, (entry, key) => {
             const fromItem = data.from.find(FixtureManager.matchFunc(relationFixture.from.match, key));
 
             // CASE: You add new fixtures e.g. a new role in a new release.

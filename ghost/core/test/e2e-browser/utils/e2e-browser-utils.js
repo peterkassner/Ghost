@@ -39,11 +39,11 @@ const setupGhost = async (page) => {
         page.locator('.gh-nav').waitFor(options).then(() => actions.noAction).catch(() => {})
     ]);
 
-    // Add owner user data from usual fixture
-    const ownerUser = DataGenerator.Content.users.find(user => user.id === '1');
+    // Add owner user data from usual fixture (find by email since owner uses ObjectID now)
+    const ownerUser = DataGenerator.Content.users.find(user => user.email === 'jbloggs@example.com');
 
     if (action === actions.signin) {
-        await signInAsUserById(page, '1');
+        await signInAsOwner(page);
     } else if (action === actions.setup) {
         // Complete setup process
         await page.getByPlaceholder('The Daily Awesome').click();
@@ -58,6 +58,17 @@ const setupGhost = async (page) => {
 
         await page.locator('.gh-nav').waitFor(options);
     }
+};
+
+const signInAsOwner = async (page) => {
+    await page.goto('/ghost');
+    // Find owner user by email since ID is now dynamic ObjectID
+    const ownerUser = DataGenerator.Content.users.find(user => user.email === 'jbloggs@example.com');
+
+    // Fill email + password
+    await page.locator('#identification').fill(ownerUser.email);
+    await page.locator('#password').fill(ownerUser.password);
+    await page.getByRole('button', {name: 'Sign in'}).click();
 };
 
 const signInAsUserById = async (page, userId) => {
@@ -528,6 +539,7 @@ module.exports = {
     setupMailgun,
     deleteAllMembers,
     signInAsUserById,
+    signInAsOwner,
     signOutCurrentUser,
     createTier,
     createOffer,

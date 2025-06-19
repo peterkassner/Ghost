@@ -160,8 +160,8 @@ describe('Admin API', function () {
                     .put('users/owner')
                     .body({
                         owner: [{
-                            id: fixtureManager.get('users', 1).id,
-                            email: fixtureManager.get('users', 1).email
+                            id: fixtureManager.get('users', 0).id,
+                            email: fixtureManager.get('users', 0).email
                         }]
                     })
                     .expectStatus(403)
