@@ -9,7 +9,13 @@ const moment = require('moment');
 
 class FixtureManager {
     constructor(fixtures) {
-        this.fixtures = fixtures;
+        if (typeof fixtures === 'function') {
+            const ownerUserId = models.User.generateId();
+
+            this.fixtures = fixtures({ownerUserId});
+        } else {
+            this.fixtures = fixtures;
+        }
     }
 
     /**
@@ -68,8 +74,8 @@ class FixtureManager {
      * @returns
      */
     async addAllFixtures(options) {
-        const userModel = this.fixtures.models.find(m => m.name === 'User');
-        const ownerUserId = userModel.entries[0].id;
+        // Assume the first user model is the owner
+        const ownerUserId = this.fixtures.models.find(m => m.name === 'User').entries[0].id;
 
         const localOptions = _.merge({
             autoRefresh: false,
@@ -80,6 +86,7 @@ class FixtureManager {
         const roleModel = this.fixtures.models.find(m => m.name === 'Role');
         await this.addFixturesForModel(roleModel, localOptions);
 
+        const userModel = this.fixtures.models.find(m => m.name === 'User');
         await this.addFixturesForModel(userModel, localOptions);
 
         const userRolesRelation = this.fixtures.relations.find(r => r.from.relation === 'roles');
