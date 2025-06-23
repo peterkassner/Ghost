@@ -57,18 +57,18 @@ describe('User API', function () {
         jsonResponse.users[1].email.should.eql(inactiveUser.email);
         jsonResponse.users[1].status.should.eql(inactiveUser.status);
 
-        jsonResponse.users[2].email.should.eql('ghost-author@example.com');
-        jsonResponse.users[3].email.should.eql(testUtils.DataGenerator.Content.users[0].email);
+        jsonResponse.users[2].email.should.eql(testUtils.DataGenerator.Content.users[0].email);
+        jsonResponse.users[3].email.should.eql('ghost-author@example.com');
 
-        testUtils.API.isISO8601(jsonResponse.users[3].last_seen).should.be.true();
-        testUtils.API.isISO8601(jsonResponse.users[3].created_at).should.be.true();
-        testUtils.API.isISO8601(jsonResponse.users[3].updated_at).should.be.true();
+        testUtils.API.isISO8601(jsonResponse.users[2].last_seen).should.be.true();
+        testUtils.API.isISO8601(jsonResponse.users[2].created_at).should.be.true();
+        testUtils.API.isISO8601(jsonResponse.users[2].updated_at).should.be.true();
 
         // only "ghost" and joe-bloggs author has a published post
         jsonResponse.users[0].url.should.eql(`${config.get('url')}/404/`);
         jsonResponse.users[1].url.should.eql(`${config.get('url')}/404/`);
-        jsonResponse.users[2].url.should.eql(`${config.get('url')}/author/ghost/`);
-        jsonResponse.users[3].url.should.eql(`${config.get('url')}/author/joe-bloggs/`);
+        jsonResponse.users[2].url.should.eql(`${config.get('url')}/author/joe-bloggs/`);
+        jsonResponse.users[3].url.should.eql(`${config.get('url')}/author/ghost/`);
     });
 
     it('Can include user roles', async function () {

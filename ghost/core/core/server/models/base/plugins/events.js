@@ -145,16 +145,18 @@ module.exports = function (Bookshelf) {
          *
          * Exceptions: internal context or importing
          */
-        onCreating: function onCreating(model, attr, options) {
+        onCreating: async function onCreating(model, attr, options) {
             if (Object.prototype.hasOwnProperty.call(schema.tables[this.tableName], 'created_by')) {
                 if (!options.importing || (options.importing && !this.get('created_by'))) {
-                    this.set('created_by', String(this.contextUser(options)));
+                    const userId = await this.contextUser(options);
+                    this.set('created_by', String(userId));
                 }
             }
 
             if (Object.prototype.hasOwnProperty.call(schema.tables[this.tableName], 'updated_by')) {
                 if (!options.importing) {
-                    this.set('updated_by', String(this.contextUser(options)));
+                    const userId = await this.contextUser(options);
+                    this.set('updated_by', String(userId));
                 }
             }
 
@@ -211,14 +213,15 @@ module.exports = function (Bookshelf) {
          *
          * @deprecated: x_by fields (https://github.com/TryGhost/Ghost/issues/10286)
          */
-        onUpdating: function onUpdating(model, attr, options) {
+        onUpdating: async function onUpdating(model, attr, options) {
             if (this.relationships) {
                 model.changed = _.omit(model.changed, this.relationships);
             }
 
             if (Object.prototype.hasOwnProperty.call(schema.tables[this.tableName], 'updated_by')) {
                 if (!options.importing && !options.migrating) {
-                    this.set('updated_by', String(this.contextUser(options)));
+                    const userId = await this.contextUser(options);
+                    this.set('updated_by', String(userId));
                 }
             }
 

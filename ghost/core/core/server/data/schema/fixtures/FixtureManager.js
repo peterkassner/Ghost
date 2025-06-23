@@ -8,8 +8,22 @@ const baseUtils = require('../../../models/base/utils');
 const moment = require('moment');
 
 class FixtureManager {
+    /**
+     * Create a new FixtureManager instance
+     *
+     * @param {Object|Function} fixtures - A fixtures object, or a non-async
+     * function that returns a fixtures object. If a function is provided, it
+     * will be called with a randomly generated owner user ID which should be
+     * used when generating the fixtures object
+     */
     constructor(fixtures) {
-        this.fixtures = fixtures;
+        if (typeof fixtures === 'function') {
+            const ownerUserId = models.User.generateId();
+
+            this.fixtures = fixtures({ownerUserId});
+        } else {
+            this.fixtures = fixtures;
+        }
     }
 
     /**
@@ -68,9 +82,21 @@ class FixtureManager {
      * @returns
      */
     async addAllFixtures(options) {
+        const ownerUserId = this.findOwnerUserId();
+
+        if (!ownerUserId) {
+            // eslint-disable-next-line
+            throw new Error('Owner user ID not found, cannot add fixtures');
+        }
+
         const localOptions = _.merge({
             autoRefresh: false,
-            context: {internal: true},
+            context: {
+                internal: true,
+                // Ensure the owner user is correctly attributed to the
+                // creation of the fixtures
+                user: ownerUserId
+            },
             migrating: true
         }, options);
 
@@ -85,7 +111,6 @@ class FixtureManager {
 
         await sequence(this.fixtures.models.filter(m => !['User', 'Role'].includes(m.name)).map(model => () => {
             logging.info('Model: ' + model.name);
-
             return this.addFixturesForModel(model, localOptions);
         }));
 
@@ -173,6 +198,24 @@ class FixtureManager {
         });
 
         return foundRelation;
+    }
+
+    /**
+     * ### Find the ID of the owner user
+     * @returns {String|null} owner user ID or null if not found
+     */
+    findOwnerUserId() {
+        const relation = this.findRelationFixture('User', 'Role');
+
+        if (!relation || !relation.entries) {
+            return null;
+        }
+
+        const ownerUserId = Object.keys(relation.entries).find((key) => {
+            return _.includes(relation.entries[key], 'Owner');
+        });
+
+        return ownerUserId || null;
     }
 
     /******************************************************

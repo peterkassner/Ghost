@@ -76,7 +76,7 @@ User = ghostBookshelf.Model.extend({
     },
 
     format(options) {
-        if (options.website && 
+        if (options.website &&
             !validator.isURL(options.website, {
                 require_protocol: true,
                 protocols: ['http', 'https']
@@ -778,9 +778,40 @@ User = ghostBookshelf.Model.extend({
         });
     },
 
+    ownerUserIdCache: {
+        value: null,
+        get: function getCachedOwnerUserId() {
+            return this.value;
+        },
+        set: function cacheOwnerUserId(value) {
+            this.value = value;
+        },
+        invalidate: function invalidateCachedOwnerUserId() {
+            this.value = null;
+        }
+    },
+
+    getOwnerUserId: function getOwnerUserId() {
+        const cachedUserId = this.ownerUserIdCache.get();
+
+        if (cachedUserId) {
+            return Promise.resolve(cachedUserId);
+        }
+
+        return this.getOwnerUser().then((user) => {
+            this.ownerUserIdCache.set(user.id);
+
+            return user.id;
+        });
+    },
+
+    generateId: function generateId() {
+        return ObjectId().toHexString();
+    },
+
     /**
      * Checks if a user has permission to perform an action on another user
-     * 
+     *
      * @param {Object|string|number} userModelOrId - The user model or ID being acted upon
      * @param {'edit'|'destroy'} action - The action being performed:
      *                                     - 'edit': Edit user details, status, or role
@@ -1112,6 +1143,8 @@ User = ghostBookshelf.Model.extend({
                 ]);
             })
             .then((results) => {
+                this.ownerUserIdCache.invalidate();
+
                 return Users.forge()
                     .query('whereIn', 'id', [contextUser.id, results[2]])
                     .fetch({withRelated: ['roles']});

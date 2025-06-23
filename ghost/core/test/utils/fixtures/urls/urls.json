@@ -1,12 +1,12 @@
 {
-    "1": {
+    "68594dec91a445438f46ad41": {
         "url": "/author/joe-bloggs/",
         "generatorId": 3,
         "resource": {
             "_events": {},
             "_eventsCount": 2,
             "data": {
-                "id": "1",
+                "id": "68594dec91a445438f46ad41",
                 "name": "Joe Bloggs",
                 "slug": "joe-bloggs",
                 "email": "jbloggs@example.com",
@@ -16,9 +16,9 @@
                 "visibility": "public",
                 "last_seen": "2021-11-17T12:56:49.000Z",
                 "created_at": "2021-11-17T12:56:48.000Z",
-                "created_by": "1",
+                "created_by": "68594dec91a445438f46ad41",
                 "updated_at": "2021-11-17T12:56:49.000Z",
-                "updated_by": "1"
+                "updated_by": "68594dec91a445438f46ad41"
             },
             "config": {
                 "type": "authors",

@@ -100,7 +100,7 @@ describe('Authors Content API', function () {
     });
 
     it('Can request author by id including post count', async function () {
-        const res = await request.get(localUtils.API.getApiQuery(`authors/1/?key=${validKey}&include=count.posts`))
+        const res = await request.get(localUtils.API.getApiQuery(`authors/68594dec91a445438f46ad41/?key=${validKey}&include=count.posts`))
             .set('Origin', testUtils.API.getURL())
             .expect('Content-Type', /json/)
             .expect('Cache-Control', testUtils.cacheRules.public)
