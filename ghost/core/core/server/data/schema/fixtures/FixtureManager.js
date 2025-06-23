@@ -10,6 +10,7 @@ const moment = require('moment');
 class FixtureManager {
     constructor(fixtures) {
         this.fixtures = fixtures;
+        this.ownerUserId = models.User.generateId();
     }
 
     /**
@@ -70,7 +71,7 @@ class FixtureManager {
     async addAllFixtures(options) {
         const localOptions = _.merge({
             autoRefresh: false,
-            context: {internal: true},
+            context: {internal: true, user: this.ownerUserId},
             migrating: true
         }, options);
 
@@ -226,6 +227,12 @@ class FixtureManager {
             });
         }
 
+        if (modelFixture.name === 'User') {
+            _.forEach(modelFixture.entries, (user) => {
+                user.id = this.ownerUserId;
+            });
+        }
+
         const results = await sequence(modelFixture.entries.map(entry => async () => {
             let data = {};
 
@@ -266,6 +273,10 @@ class FixtureManager {
         const data = await this.fetchRelationData(relationFixture, options);
 
         _.each(relationFixture.entries, (entry, key) => {
+            if (relationFixture.from.model === 'User' && relationFixture.to.model === 'Role') {
+                key = this.ownerUserId;
+            }
+
             const fromItem = data.from.find(FixtureManager.matchFunc(relationFixture.from.match, key));
 
             // CASE: You add new fixtures e.g. a new role in a new release.

@@ -54,7 +54,14 @@ ghostBookshelf.plugin(require('./plugins/bulk-operations'));
 
 ghostBookshelf.plugin(require('./plugins/filtered-collection'));
 
-ghostBookshelf.plugin(require('./plugins/user-type'));
+ghostBookshelf.plugin(require('./plugins/user-type'), {
+    resolveIntegrationUserId: function resolveIntegrationUserId() {
+        return ghostBookshelf.model('User').getOwnerUserId();
+    },
+    resolveInternalUserId: function resolveInternalUserId() {
+        return ghostBookshelf.model('User').getOwnerUserId();
+    }
+});
 
 ghostBookshelf.plugin(require('./plugins/data-manipulation'));
 
