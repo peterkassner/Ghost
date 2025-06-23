@@ -10,7 +10,6 @@ const moment = require('moment');
 class FixtureManager {
     constructor(fixtures) {
         this.fixtures = fixtures;
-        this.ownerUserId = models.User.generateId();
     }
 
     /**
@@ -69,16 +68,18 @@ class FixtureManager {
      * @returns
      */
     async addAllFixtures(options) {
+        const userModel = this.fixtures.models.find(m => m.name === 'User');
+        const ownerUserId = userModel.entries[0].id;
+
         const localOptions = _.merge({
             autoRefresh: false,
-            context: {internal: true, user: this.ownerUserId},
+            context: {internal: true, user: ownerUserId},
             migrating: true
         }, options);
 
         const roleModel = this.fixtures.models.find(m => m.name === 'Role');
         await this.addFixturesForModel(roleModel, localOptions);
 
-        const userModel = this.fixtures.models.find(m => m.name === 'User');
         await this.addFixturesForModel(userModel, localOptions);
 
         const userRolesRelation = this.fixtures.relations.find(r => r.from.relation === 'roles');
@@ -227,12 +228,6 @@ class FixtureManager {
             });
         }
 
-        if (modelFixture.name === 'User') {
-            _.forEach(modelFixture.entries, (user) => {
-                user.id = this.ownerUserId;
-            });
-        }
-
         const results = await sequence(modelFixture.entries.map(entry => async () => {
             let data = {};
 
@@ -273,10 +268,6 @@ class FixtureManager {
         const data = await this.fetchRelationData(relationFixture, options);
 
         _.each(relationFixture.entries, (entry, key) => {
-            if (relationFixture.from.model === 'User' && relationFixture.to.model === 'Role') {
-                key = this.ownerUserId;
-            }
-
             const fromItem = data.from.find(FixtureManager.matchFunc(relationFixture.from.match, key));
 
             // CASE: You add new fixtures e.g. a new role in a new release.

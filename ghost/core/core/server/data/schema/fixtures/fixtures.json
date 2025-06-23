@@ -722,7 +722,7 @@
             "name": "User",
             "entries": [
                 {
-                    "id": 1,
+                    "id": "685941d4fab45bb976ec1e2c",
                     "name": "Ghost",
                     "email": "ghost@example.com",
                     "status": "inactive",
@@ -746,8 +746,8 @@
                     "type": "post",
                     "status": "published",
                     "visibility": "public",
-                    "created_by": "1",
-                    "published_by": "1"
+                    "created_by": "685941d4fab45bb976ec1e2c",
+                    "published_by": "685941d4fab45bb976ec1e2c"
                 },
                 {
                     "title": "About this site",
@@ -757,8 +757,8 @@
                     "type": "page",
                     "status": "published",
                     "visibility": "public",
-                    "created_by": "1",
-                    "published_by": "1"
+                    "created_by": "685941d4fab45bb976ec1e2c",
+                    "published_by": "685941d4fab45bb976ec1e2c"
                 }
             ]
         },
@@ -1023,7 +1023,7 @@
                 "match": "name"
             },
             "entries": {
-                "1": ["Owner"]
+                "685941d4fab45bb976ec1e2c": ["Owner"]
             }
         }
     ]
