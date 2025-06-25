@@ -75,10 +75,14 @@ module.exports.extendModel = function extendModel(Post, Posts, ghostBookshelf) {
             return proto.onFetchedCollection.call(this, collection, attrs, options);
         },
 
-        onCreating: function onCreating(model, attrs, options) {
+        onCreating: async function onCreating(model, attrs, options) {
             if (!model.get('authors')) {
+                const ownerUser = await ghostBookshelf
+                    .model('User')
+                    .getOwnerUser(Object.assign({}, _.pick(options, 'transacting')));
+
                 model.set('authors', [{
-                    id: this.contextUser(options)
+                    id: ownerUser.id
                 }]);
             }
 
